@@ -1,26 +1,31 @@
-extends: eslint-config-airbnb
-parser: babel-eslint
-parserOptions:
-  ecmaFeatures:
-      experimentalDecorators: true
-env:
-  browser: true
-  node: true
-
-rules:
-  # These rules are covered by prettier
-  semi: off
-  no-extra-semi: off
-  max-len: off
-  arrow-parens: off
-  comma-dangle: off
-  quotes: off
-  indent: off
-  no-tabs: off
-  react/jsx-indent: off
-  react/jsx-indent-props: off
-
-  # These rules are super annoying in this project
-  react/jsx-filename-extension: off
-  class-methods-use-this: off
-  no-confusing-arrow: off
+{
+	"parser": "@typescript-eslint/parser",
+	"plugins": ["@typescript-eslint", "react-hooks", "no-for-of-loops"],
+	"extends": [
+		"eslint:recommended",
+		"plugin:react/recommended",
+		"plugin:@typescript-eslint/recommended",
+		"prettier",
+		"prettier/@typescript-eslint"
+	],
+	"settings": {
+		"react": {
+			"version": "16.8"
+		}
+	},
+	"env": {
+		"browser": true,
+		"jest": true,
+		"es6": true,
+		"node": true
+	},
+	"rules": {
+		"no-for-of-loops/no-for-of-loops": 2,
+		"@typescript-eslint/explicit-function-return-type": 0,
+		"@typescript-eslint/no-explicit-any": 0,
+		"@typescript-eslint/no-object-literal-type-assertion": 0,
+		"@typescript-eslint/no-non-null-assertion": 0,
+		"@typescript-eslint/no-use-before-define": 0,
+		"react/prop-types": 0
+	}
+}

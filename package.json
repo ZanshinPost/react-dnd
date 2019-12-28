@@ -1,5 +1,5 @@
 {
-  "name": "react-dnd-master",
+  "name": "react-dnd-parent",
   "private": true,
   "description": "React-DnD Monorepo",
   "repository": {
@@ -27,86 +27,175 @@
     "Jordan Gensler (http://github.com/kesne)",
     "Gagan (https://github.com/thetechie)"
   ],
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/react-dnd/react-dnd/issues"
   },
   "homepage": "https://github.com/react-dnd/react-dnd",
   "scripts": {
-    "start": "./scripts/startSiteDevServer.sh",
-    "build-site": "./scripts/buildStaticSite.sh",
-    "publish-site": "./scripts/publishStaticSite.sh",
-    "postinstall": "lerna bootstrap",
+    "clean": "lerna run clean",
+    "build": "lerna run build --stream",
     "unit_test": "jest",
     "jest:watch": "jest --watch",
     "jest:cov": "jest --coverage",
-    "lint": "eslint .",
-    "test_modules": "lerna run test --stream",
-    "test": "npm-run-all lint jest:cov test_modules",
-    "prettier": "prettier 'packages/*/**/*.js' 'examples/**/*.js' 'site/**/*.js' --write",
-    "precommit": "lint-staged"
+    "lint:code": "eslint . --ext .js,.ts,.jsx,.tsx",
+    "lint:spelling": "mdspell 'packages/documentation/docsite/markdown/**/*.md' --en-us --report",
+    "lint:tone": "alex .",
+    "lint": "run-s lint:*",
+    "changelog": "conventional-changelog -p eslint -i CHANGELOG.md -s -r 0",
+    "release_canary": "lerna publish -c --preid next --yes",
+    "release": "run-s clean test go_no_go release:packages changelog",
+    "release:packages": "lerna publish",
+    "test_modules": "CI=true lerna run test --stream",
+    "go_no_go": "node scripts/go_no_go.js",
+    "verify_source": "run-p lint build",
+    "run_tests": "run-p test_modules jest:cov",
+    "test": "run-s clean verify_source run_tests",
+    "ci": "run-s verify_source run_tests",
+    "prettify:source": "prettier 'packages/*/*/src/**/*.ts*'",
+    "prettify": "prettier 'packages/*/**/*.js' 'examples/**/*.js' 'site/**/*.js'",
+    "precommit:lint": "lint-staged",
+    "precommit:format": "pretty-quick --staged",
+    "start": "lerna run --parallel --stream start",
+    "start_docs": "lerna run --stream start --scope react-dnd-documentation",
+    "watch": "lerna run --parallel --stream watch"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "run-s precommit:lint precommit:format",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   },
   "devDependencies": {
-    "autoprefixer": "^7.1.2",
-    "babel-cli": "^6.24.1",
-    "babel-eslint": "^7.2.3",
-    "babel-loader": "^7.1.1",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-preset-env": "^1.6.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "babel-register": "^6.24.1",
-    "css-loader": "^0.28.4",
-    "eslint": "^3.14.0",
-    "eslint-config-airbnb": "^14.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-jsx-a11y": "^3.0.2",
-    "eslint-plugin-react": "^6.9.0",
-    "extract-text-webpack-plugin": "^2.0.0",
-    "faker": "^3.1.0",
-    "file-loader": "^0.11.2",
-    "html-loader": "^0.4.5",
-    "husky": "^0.14.3",
-    "immutability-helper": "^2.4.0",
-    "jest": "^20.0.4",
-    "karma-sourcemap-loader": "^0.3.6",
-    "lerna": "^2.0.0",
-    "less": "^2.7.2",
-    "less-loader": "^4.0.5",
-    "lint-staged": "^4.2.3",
-    "marked": "^0.3.6",
-    "npm-run-all": "^4.0.2",
-    "null-loader": "^0.1.0",
-    "postcss": "^6.0.6",
-    "prettier": "^1.7.4",
-    "prop-types": "^15.6.0",
-    "react": "^16.x",
-    "react-dom": "^16.x",
-    "react-frame-component": "^1.1.0",
-    "react-hot-loader": "3.0.0-beta.7",
-    "rimraf": "^2.6.1",
-    "style-loader": "^0.18.2",
-    "url-loader": "^0.5.9",
-    "webpack": "^3.1.0",
-    "webpack-dev-server": "^2.5.1"
+    "@babel/cli": "^7.7.5",
+    "@babel/core": "^7.7.5",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.7.4",
+    "@babel/preset-env": "^7.7.5",
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "@rollup/plugin-replace": "darthtrevino/rollup-replace-temp-deleteme#master",
+    "@types/jest": "^24.0.23",
+    "@types/enzyme": "^3.10.4",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
+    "alex": "^8.0.1",
+    "conventional-changelog-cli": "^2.0.27",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
+    "eslint": "^6.7.0",
+    "eslint-config-prettier": "^6.7.0",
+    "eslint-config-react-app": "^5.0.2",
+    "eslint-plugin-no-for-of-loops": "^1.0.1",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.16.0",
+    "eslint-plugin-react-hooks": "^2.3.0",
+    "husky": "^3.1.0",
+    "inquirer": "^7.0.0",
+    "jest": "^24.9.0",
+    "jest-environment-jsdom": "^24.9.0",
+    "lerna": "^3.19.0",
+    "lint-staged": "^9.4.3",
+    "markdown-spellcheck": "^1.3.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.1",
+    "pretty-quick": "^2.0.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "replace-in-file": "^5.0.2",
+    "rollup": "^1.27.4",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^5.1.2",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.7.2"
   },
   "jest": {
+    "clearMocks": true,
+    "cacheDirectory": ".jest-cache",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest/setup-enzyme.js"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx"
+    ],
+    "modulePaths": [
+      "<rootDir>/packages/core/",
+      "<rootDir>/packages/testing/"
+    ],
     "moduleNameMapper": {
-      "^react-dnd$": "<rootDir>/packages/react-dnd/src",
-      "react-dnd-html5-backend": "<rootDir>//packages/react-dnd-html5-backend/src",
-      "dnd-core": "<rootDir>//packages/dnd-core/src"
+      "^dnd-core$": "dnd-core/dist/cjs",
+      "^react-dnd$": "react-dnd/dist/cjs",
+      "^react-dnd-html5-backend$": "html5-backend/dist/cjs",
+      "^react-dnd-touch-backend$": "touch-backend/dist/cjs",
+      "^react-dnd-test-backend$": "react-dnd-test-backend/dist/cjs",
+      "^react-dnd-test-utils$": "react-dnd-test-utils/dist/cjs"
+    },
+    "collectCoverageFrom": [
+      "packages/core/**/*.{ts,tsx}",
+      "!**/node_modules/**",
+      "!**/lib/**",
+      "!**/__tests__/**"
+    ],
+    "testMatch": [
+      "<rootDir>/__tests__/**/?(*.)(spec|test).ts(x|)",
+      "<rootDir>/packages/core/dnd-core/src/**/__tests__/**/?(*.)(spec|test).ts(x|)",
+      "<rootDir>/packages/core/react-dnd/src/**/__tests__/**/?(*.)(spec|test).ts(x|)",
+      "<rootDir>/packages/core/html5-backend/src/**/__tests__/**/?(*.)(spec|test).ts(x|)",
+      "<rootDir>/packages/core/touch-backend/src/**/__tests__/**/?(*.)(spec|test).ts(x|)"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.jest.json",
+        "diagnostics": {
+          "pathRegex": "/.(spec|test).ts$/"
+        }
+      }
     }
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "eslint"
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "git add"
     ]
   },
   "prettier": {
     "semi": false,
     "singleQuote": true,
     "trailingComma": "all",
-    "useTabs": true
+    "useTabs": true,
+    "overrides": [
+      {
+        "files": "*.md",
+        "options": {
+          "useTabs": false
+        }
+      },
+      {
+        "files": "*.json",
+        "options": {
+          "useTabs": false,
+          "tabWidth": 2
+        }
+      }
+    ]
+  },
+  "workspaces": {
+    "packages": [
+      "packages/alternative_builds/umd",
+      "packages/alternative_builds/cjs/*",
+      "packages/documentation/*",
+      "packages/testing/*",
+      "packages/core/*"
+    ],
+    "nohoist": [
+      "react-dnd-documentation/**"
+    ]
   }
 }
